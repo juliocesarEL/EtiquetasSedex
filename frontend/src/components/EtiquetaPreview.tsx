@@ -14,18 +14,20 @@ export function EtiquetaPreview({ layout, campos }: EtiquetaPreviewProps) {
   useEtiquetaCanvas(canvasRef, layout, campos)
 
   return (
-    <div className={styles.wrap}>
+    <div>
       <span className={styles.legenda}>
         <span className={styles.pontoVivo} />
         Prévia em tempo real
       </span>
-      {layout ? (
-        <canvas ref={canvasRef} className={styles.canvas} aria-label="Prévia da etiqueta SEDEX" />
-      ) : (
-        <div className={styles.placeholder}>
-          <Spinner size={22} />
-        </div>
-      )}
+      <div className={styles.wrap}>
+        {layout ? (
+          <canvas ref={canvasRef} className={styles.canvas} aria-label="Prévia da etiqueta SEDEX" />
+        ) : (
+          <div className={styles.placeholder}>
+            <Spinner size={22} />
+          </div>
+        )}
+      </div>
     </div>
   )
 }

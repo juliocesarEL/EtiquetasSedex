@@ -27,20 +27,16 @@
 }
 
 .legenda {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.35rem 0.75rem 0.35rem 0.6rem;
+  margin-bottom: 0.6rem;
+  padding: 0.3rem 0.7rem 0.3rem 0.55rem;
   border-radius: var(--radius-pill);
-  background: rgba(16, 27, 48, 0.6);
-  backdrop-filter: blur(8px);
-  color: white;
+  background: var(--navy-100);
+  color: var(--navy-800);
   font-size: 0.72rem;
-  font-weight: 600;
-  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.4);
+  font-weight: 700;
 }
 
 .pontoVivo {

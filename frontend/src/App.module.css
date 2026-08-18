@@ -5,8 +5,129 @@
 }
 
 .main {
+  position: relative;
   flex: 1;
   padding: clamp(1.5rem, 5vw, 3.5rem) 1.25rem 4rem;
+  overflow: hidden;
+}
+
+.main::before,
+.main::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.main::before {
+  width: min(46vw, 620px);
+  height: min(46vw, 620px);
+  top: -18%;
+  left: -14%;
+  background: radial-gradient(circle, rgba(38, 64, 110, 0.14), transparent 70%);
+}
+
+.main::after {
+  width: min(38vw, 520px);
+  height: min(38vw, 520px);
+  bottom: -16%;
+  right: -10%;
+  background: radial-gradient(circle, rgba(245, 196, 48, 0.16), transparent 70%);
+}
+
+.marcaDagua {
+  position: absolute;
+  bottom: -4%;
+  right: -3%;
+  color: var(--navy-800);
+  opacity: 0.045;
+  transform: rotate(-8deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.camadaConteudo {
+  position: relative;
+  z-index: 1;
+  max-width: 1680px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "lateral"
+    "topo"
+    "principal";
+  column-gap: 2.5rem;
+  row-gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 1180px) {
+  .camadaConteudo {
+    /* Até aqui, o card usa todo o espaço que sobra ao lado do painel —
+       prioriza o card ficar confortável em telas de notebook comuns. */
+    grid-template-columns: 300px minmax(0, 1fr);
+    grid-template-areas:
+      ".       topo"
+      "lateral principal";
+  }
+}
+
+@media (min-width: 1600px) {
+  .camadaConteudo {
+    /* Só em telas bem largas sobra espaço de sobra pra centralizar o
+       card de verdade na página, com uma coluna vazia simétrica à direita. */
+    grid-template-columns: 300px minmax(0, 900px) 300px;
+    justify-content: center;
+    grid-template-areas:
+      ".       topo      ."
+      "lateral principal .";
+  }
+}
+
+.areaTopo {
+  grid-area: topo;
+}
+
+.colunaPrincipal {
+  grid-area: principal;
+  min-width: 0;
+}
+
+.colunaLateral {
+  grid-area: lateral;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+@media (min-width: 1180px) {
+  .colunaLateral {
+    position: sticky;
+    top: 1.5rem;
+  }
+}
+
+.hero {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 2.25rem;
+}
+
+.hero h1 {
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.6rem, 3vw, 2.15rem);
+  letter-spacing: -0.02em;
+  color: var(--navy-900);
+}
+
+.hero p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1.55;
 }
 
 .conteudo {
@@ -22,13 +143,6 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.footer {
-  text-align: center;
-  padding: 1.5rem;
-  color: var(--ink-faint);
-  font-size: 0.78rem;
 }
 
 .avisoLayout {

@@ -137,3 +137,50 @@ export function TruckIcon(props: IconProps) {
     </svg>
   )
 }
+
+export function PhoneIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L14 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 2 6a2 2 0 0 1 2-2Z" />
+    </svg>
+  )
+}
+
+export function GlassIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M6 3h12l-1.2 9.5a4.8 4.8 0 0 1-9.6 0Z" />
+      <path d="M12 15v6M8 21h8" />
+    </svg>
+  )
+}
+
+export function ArrowsUpIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M12 21V8M7 13l5-5 5 5" />
+      <path d="M6 4h12" />
+    </svg>
+  )
+}
+
+export function HandsIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M12 3v9" />
+      <path d="M8 22h8l3-6-2-4-3 2-1-1H9l-3 2-2 4Z" />
+      <path d="M9 12 5 9" />
+      <path d="M15 12l4-3" />
+    </svg>
+  )
+}
+
+export function UmbrellaIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M12 3a9 9 0 0 1 9 9H3a9 9 0 0 1 9-9Z" />
+      <path d="M12 12v7a2 2 0 0 1-4 0" />
+      <path d="M12 3v2" />
+    </svg>
+  )
+}

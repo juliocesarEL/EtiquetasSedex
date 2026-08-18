@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react'
 import styles from './App.module.css'
 import { Header } from './components/Header'
+import { Footer } from './components/Footer'
+import { TruckIcon } from './components/icons'
 import { StepIndicator } from './components/StepIndicator'
 import type { Etapa } from './components/StepIndicator'
 import { UploadCard } from './components/UploadCard'
 import { ConferenciaCard } from './components/ConferenciaCard'
 import { ResultCard } from './components/ResultCard'
 import { FilaImpressao } from './components/FilaImpressao'
+import { ComoFunciona } from './components/ComoFunciona'
 import { Banner } from './components/ui/Banner'
 import { ApiError, gerarEtiqueta, obterLayoutEtiqueta, processarOrcamento } from './api/client'
 import { imprimirFolhaComEtiquetas } from './utils/imprimir'
@@ -164,55 +167,77 @@ function App() {
     <div className={styles.app}>
       <Header />
       <main className={styles.main}>
-        <StepIndicator etapaAtual={etapa} />
+        <TruckIcon width={340} height={340} className={styles.marcaDagua} />
 
-        {erroLayout && (
-          <div className={styles.avisoLayout}>
-            <Banner tone="error">{erroLayout}</Banner>
+        <div className={styles.camadaConteudo}>
+          <div className={styles.colunaLateral}>
+            <ComoFunciona />
           </div>
-        )}
 
-        <FilaImpressao
-          itens={filaImpressao}
-          onRemover={handleRemoverDaFila}
-          onLimpar={handleLimparFila}
-          onImprimir={handleImprimirFolha}
-        />
+          <div className={styles.areaTopo}>
+            {etapa === 'upload' && (
+              <div className={styles.hero}>
+                <h1>Etiquetas de envio, prontas em segundos</h1>
+                <p>
+                  Suba o PDF do orçamento e deixe o resto com a gente — extração automática dos dados, layout
+                  oficial BWR, pronta pra imprimir e colar.
+                </p>
+              </div>
+            )}
 
-        <div className={styles.conteudo}>
-          {etapa === 'upload' && (
-            <UploadCard processando={processando} erro={erroUpload} onProcessar={handleProcessar} />
-          )}
+            <StepIndicator etapaAtual={etapa} />
 
-          {etapa === 'conferencia' && (
-            <ConferenciaCard
-              campos={campos}
-              fonteEndereco={fonteEndereco}
-              layout={layouts[tipoEtiqueta] ?? null}
-              tipoEtiqueta={tipoEtiqueta}
-              gerando={gerando}
-              erro={erroGeracao}
-              onAlterarCampo={handleAlterarCampo}
-              onAlterarTipoEtiqueta={setTipoEtiqueta}
-              onVoltar={handleVoltar}
-              onConfirmar={handleConfirmar}
+            {erroLayout && (
+              <div className={styles.avisoLayout}>
+                <Banner tone="error">{erroLayout}</Banner>
+              </div>
+            )}
+          </div>
+
+          <div className={styles.colunaPrincipal}>
+            <FilaImpressao
+              itens={filaImpressao}
+              onRemover={handleRemoverDaFila}
+              onLimpar={handleLimparFila}
+              onImprimir={handleImprimirFolha}
             />
-          )}
 
-          {etapa === 'pronta' && imagemFinalUrl && (
-            <ResultCard
-              imagemUrl={imagemFinalUrl}
-              nomeArquivo={nomeParaArquivo(campos.destinatario, tipoEtiqueta)}
-              naFila={Boolean(itemAtualNaFila)}
-              filaCheia={filaImpressao.length >= LIMITE_FILA}
-              onNovaEtiqueta={handleNovaEtiqueta}
-              onAdicionarAFila={handleAdicionarAFila}
-              onRemoverDaFila={() => itemAtualNaFila && handleRemoverDaFila(itemAtualNaFila.id)}
-            />
-          )}
+            <div className={styles.conteudo}>
+              {etapa === 'upload' && (
+                <UploadCard processando={processando} erro={erroUpload} onProcessar={handleProcessar} />
+              )}
+
+              {etapa === 'conferencia' && (
+                <ConferenciaCard
+                  campos={campos}
+                  fonteEndereco={fonteEndereco}
+                  layout={layouts[tipoEtiqueta] ?? null}
+                  tipoEtiqueta={tipoEtiqueta}
+                  gerando={gerando}
+                  erro={erroGeracao}
+                  onAlterarCampo={handleAlterarCampo}
+                  onAlterarTipoEtiqueta={setTipoEtiqueta}
+                  onVoltar={handleVoltar}
+                  onConfirmar={handleConfirmar}
+                />
+              )}
+
+              {etapa === 'pronta' && imagemFinalUrl && (
+                <ResultCard
+                  imagemUrl={imagemFinalUrl}
+                  nomeArquivo={nomeParaArquivo(campos.destinatario, tipoEtiqueta)}
+                  naFila={Boolean(itemAtualNaFila)}
+                  filaCheia={filaImpressao.length >= LIMITE_FILA}
+                  onNovaEtiqueta={handleNovaEtiqueta}
+                  onAdicionarAFila={handleAdicionarAFila}
+                  onRemoverDaFila={() => itemAtualNaFila && handleRemoverDaFila(itemAtualNaFila.id)}
+                />
+              )}
+            </div>
+          </div>
         </div>
       </main>
-      <footer className={styles.footer}>BWR Bombas, Serviços e Comércio — Etiquetas SEDEX</footer>
+      <Footer />
     </div>
   )
 }
