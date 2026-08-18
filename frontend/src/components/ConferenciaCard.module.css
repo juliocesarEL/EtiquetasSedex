@@ -1,14 +1,35 @@
 .card {
+  position: relative;
   background: var(--paper-raised);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  border: var(--card-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
   padding: clamp(1.5rem, 4vw, 2.5rem);
   max-width: 980px;
   margin: 0 auto;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--flame-500), var(--amber-400));
 }
 
 .intro {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
   margin-bottom: 1.5rem;
+}
+
+.introTexto {
+  flex: 1;
+  min-width: 220px;
 }
 
 .intro h2 {

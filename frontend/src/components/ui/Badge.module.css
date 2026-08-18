@@ -7,16 +7,19 @@
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.01em;
+  border: 1px solid transparent;
 }
 
 .observacao {
   background: var(--success-100);
   color: #106239;
+  border-color: rgba(31, 157, 99, 0.18);
 }
 
 .topo {
   background: var(--info-100);
   color: #1c4a8f;
+  border-color: rgba(47, 111, 214, 0.18);
 }
 
 .dot {

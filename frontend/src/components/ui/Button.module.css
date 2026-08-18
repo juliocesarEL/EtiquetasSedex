@@ -10,20 +10,22 @@
   padding: 0.75rem 1.4rem;
   cursor: pointer;
   transition:
-    transform 0.15s var(--ease-out),
-    box-shadow 0.15s var(--ease-out),
-    background-color 0.15s var(--ease-out),
+    transform 0.18s var(--ease-spring),
+    box-shadow 0.2s var(--ease-out),
+    background-color 0.18s var(--ease-out),
+    border-color 0.18s var(--ease-out),
     opacity 0.15s var(--ease-out);
   white-space: nowrap;
 }
 
 .button:active:not(:disabled) {
-  transform: scale(0.97);
+  transform: scale(0.96);
+  transition-duration: 0.08s;
 }
 
 .button:disabled {
   cursor: not-allowed;
-  opacity: 0.55;
+  opacity: 0.5;
 }
 
 .button:focus-visible {
@@ -34,23 +36,30 @@
 .primary {
   background: linear-gradient(180deg, var(--navy-700), var(--navy-800));
   color: white;
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    var(--shadow-sm);
 }
 
 .primary:hover:not(:disabled) {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    var(--shadow-md);
+  transform: translateY(-1.5px);
 }
 
 .secondary {
-  background: white;
+  background: var(--paper-raised);
   color: var(--navy-800);
   border: 1.5px solid var(--line);
+  box-shadow: var(--shadow-xs);
 }
 
 .secondary:hover:not(:disabled) {
   border-color: var(--navy-600);
   background: var(--navy-100);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
 }
 
 .ghost {
@@ -67,12 +76,16 @@
 .accent {
   background: linear-gradient(180deg, var(--amber-400), var(--amber-500));
   color: var(--navy-950);
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    var(--shadow-sm);
 }
 
 .accent:hover:not(:disabled) {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    var(--shadow-glow-amber);
+  transform: translateY(-1.5px);
 }
 
 .full {

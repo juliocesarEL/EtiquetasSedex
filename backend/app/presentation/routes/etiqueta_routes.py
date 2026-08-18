@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import Response
 
 from app.application.gerar_etiqueta import GerarEtiquetaUseCase
 from app.config import get_settings
-from app.infrastructure.image.layout import ALTURA_TEMPLATE, COR_TEXTO, LARGURA_TEMPLATE, LAYOUT_CAMPOS
+from app.infrastructure.image.layout import COR_TEXTO, TEMPLATES, TIPO_PADRAO
 from app.presentation.dependencies import obter_gerar_etiqueta_use_case
 from app.presentation.rate_limit import limiter
 from app.presentation.schemas.etiqueta_schemas import (
@@ -22,11 +24,12 @@ def _cor_hex(cor: tuple[int, int, int]) -> str:
 
 
 @router.get("/layout", response_model=LayoutEtiquetaResponse)
-async def obter_layout() -> LayoutEtiquetaResponse:
+async def obter_layout(tipo: Literal["sedex", "pac"] = TIPO_PADRAO) -> LayoutEtiquetaResponse:
+    template = TEMPLATES[tipo]
     return LayoutEtiquetaResponse(
-        largura=LARGURA_TEMPLATE,
-        altura=ALTURA_TEMPLATE,
-        templateUrl="/static/etiqueta_template.png",
+        largura=template.largura,
+        altura=template.altura,
+        templateUrl=f"/static/{template.caminho_arquivo}",
         corTexto=_cor_hex(COR_TEXTO),
         campos={
             chave: CampoLayoutResponse(
@@ -37,7 +40,7 @@ async def obter_layout() -> LayoutEtiquetaResponse:
                 yCentro=campo.y_centro,
                 tamanhoFonteMax=campo.tamanho_fonte_max,
             )
-            for chave, campo in LAYOUT_CAMPOS.items()
+            for chave, campo in template.campos.items()
         },
     )
 
@@ -56,9 +59,10 @@ async def gerar_etiqueta(
         cidade=dados.cidade,
         cep=dados.cep,
         observacoes=dados.observacoes,
+        tipo=dados.tipo,
     )
     return Response(
         content=imagem_png,
         media_type="image/png",
-        headers={"Content-Disposition": "inline; filename=etiqueta-sedex.png"},
+        headers={"Content-Disposition": f"inline; filename=etiqueta-{dados.tipo}.png"},
     )

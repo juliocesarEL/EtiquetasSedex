@@ -15,7 +15,10 @@ export function EtiquetaPreview({ layout, campos }: EtiquetaPreviewProps) {
 
   return (
     <div className={styles.wrap}>
-      <span className={styles.legenda}>Prévia em tempo real</span>
+      <span className={styles.legenda}>
+        <span className={styles.pontoVivo} />
+        Prévia em tempo real
+      </span>
       {layout ? (
         <canvas ref={canvasRef} className={styles.canvas} aria-label="Prévia da etiqueta SEDEX" />
       ) : (

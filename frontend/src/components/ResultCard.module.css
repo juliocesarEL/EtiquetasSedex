@@ -1,24 +1,38 @@
 .card {
+  position: relative;
   background: var(--paper-raised);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  border: var(--card-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
   padding: clamp(1.5rem, 4vw, 2.5rem);
   max-width: 680px;
   margin: 0 auto;
   text-align: center;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--success-500), var(--amber-400));
 }
 
 .selo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: var(--success-100);
+  background: radial-gradient(circle at 35% 30%, #e8fbf1, var(--success-100));
   color: var(--success-500);
   margin-bottom: 1rem;
-  animation: pop 0.4s var(--ease-out);
+  box-shadow:
+    0 0 0 6px rgba(31, 157, 99, 0.08),
+    var(--shadow-xs);
+  animation: pop 0.45s var(--ease-spring);
 }
 
 @keyframes pop {
@@ -49,7 +63,7 @@
   overflow: hidden;
   box-shadow: var(--shadow-lg);
   margin-bottom: 1.75rem;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(16, 27, 48, 0.5);
 }
 
 .imagem {

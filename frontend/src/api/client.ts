@@ -1,4 +1,4 @@
-import type { CamposEtiqueta, CamposEtiquetaExtraidos, LayoutEtiqueta } from '../types'
+import type { CamposEtiqueta, CamposEtiquetaExtraidos, LayoutEtiqueta, TipoEtiqueta } from '../types'
 
 export class ApiError extends Error {
   status: number
@@ -55,16 +55,16 @@ export async function processarOrcamento(arquivo: File): Promise<CamposEtiquetaE
   }
 }
 
-export async function obterLayoutEtiqueta(): Promise<LayoutEtiqueta> {
-  const resposta = await fetch('/api/etiquetas/layout')
+export async function obterLayoutEtiqueta(tipo: TipoEtiqueta): Promise<LayoutEtiqueta> {
+  const resposta = await fetch(`/api/etiquetas/layout?tipo=${tipo}`)
   return tratarResposta<LayoutEtiqueta>(resposta)
 }
 
-export async function gerarEtiqueta(campos: CamposEtiqueta): Promise<Blob> {
+export async function gerarEtiqueta(campos: CamposEtiqueta, tipo: TipoEtiqueta): Promise<Blob> {
   const resposta = await fetch('/api/etiquetas/gerar', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(campos),
+    body: JSON.stringify({ ...campos, tipo }),
   })
 
   if (!resposta.ok) {

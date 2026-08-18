@@ -5,7 +5,7 @@ export function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.brand}>
-        <div className={styles.mark}>BWR</div>
+        <img src="/LOGO%20LARANJA%201600.png" alt="BWR" className={styles.logo} />
         <div className={styles.titles}>
           <h1>Etiquetas SEDEX</h1>
           <p>Bombas, Serviços e Comércio</p>

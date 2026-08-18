@@ -7,10 +7,11 @@ from PIL import Image, ImageDraw, ImageFont
 
 from app.infrastructure.image.layout import (
     CAMINHO_FONTE_BOLD,
-    CAMINHO_TEMPLATE,
     COR_TEXTO,
-    LAYOUT_CAMPOS,
+    TEMPLATES,
+    TIPO_PADRAO,
     CampoLayout,
+    TipoEtiqueta,
 )
 
 _REENTICENCIAS = "…"
@@ -18,10 +19,10 @@ _REENTICENCIAS = "…"
 
 class PillowLabelRenderer:
     """Implementação de RenderizadorEtiquetaPort: desenha os campos sobre
-    o template visual oficial da etiqueta BWR usando Pillow."""
+    o template visual oficial da etiqueta BWR (SEDEX ou PAC) usando Pillow."""
 
     def __init__(self, assets_dir: Path) -> None:
-        self._template_path = assets_dir / CAMINHO_TEMPLATE
+        self._assets_dir = assets_dir
         self._fonte_path = assets_dir / CAMINHO_FONTE_BOLD
         self._fonte_cache: dict[int, ImageFont.FreeTypeFont] = {}
 
@@ -56,8 +57,10 @@ class PillowLabelRenderer:
         cidade: str,
         cep: str,
         observacoes: str = "",
+        tipo: TipoEtiqueta = TIPO_PADRAO,
     ) -> bytes:
-        imagem = Image.open(self._template_path).convert("RGB")
+        template = TEMPLATES[tipo]
+        imagem = Image.open(self._assets_dir / template.caminho_arquivo).convert("RGB")
         draw = ImageDraw.Draw(imagem)
 
         valores = {
@@ -69,7 +72,7 @@ class PillowLabelRenderer:
             "observacoes": observacoes,
         }
 
-        for chave, campo in LAYOUT_CAMPOS.items():
+        for chave, campo in template.campos.items():
             texto = valores[chave]
             if not texto:
                 continue

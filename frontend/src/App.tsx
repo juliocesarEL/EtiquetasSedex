@@ -10,7 +10,7 @@ import { FilaImpressao } from './components/FilaImpressao'
 import { Banner } from './components/ui/Banner'
 import { ApiError, gerarEtiqueta, obterLayoutEtiqueta, processarOrcamento } from './api/client'
 import { imprimirFolhaComEtiquetas } from './utils/imprimir'
-import type { CamposEtiqueta, FonteEndereco, ItemFilaImpressao, LayoutEtiqueta } from './types'
+import type { CamposEtiqueta, FonteEndereco, ItemFilaImpressao, LayoutEtiqueta, TipoEtiqueta } from './types'
 
 const CAMPOS_VAZIOS: CamposEtiqueta = {
   destinatario: '',
@@ -22,6 +22,7 @@ const CAMPOS_VAZIOS: CamposEtiqueta = {
 }
 
 const LIMITE_FILA = 4
+const TIPOS_ETIQUETA: TipoEtiqueta[] = ['sedex', 'pac']
 
 function mensagemDeErro(erro: unknown, padrao: string): string {
   return erro instanceof ApiError ? erro.message : padrao
@@ -29,20 +30,21 @@ function mensagemDeErro(erro: unknown, padrao: string): string {
 
 const PADRAO_MARCAS_DIACRITICAS = /[̀-ͯ]/g
 
-function nomeParaArquivo(destinatario: string): string {
+function nomeParaArquivo(destinatario: string, tipo: TipoEtiqueta): string {
   const slug = destinatario
     .normalize('NFD')
     .replace(PADRAO_MARCAS_DIACRITICAS, '')
     .replace(/[^a-zA-Z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
     .toLowerCase()
-  return `etiqueta-sedex${slug ? `-${slug}` : ''}.png`
+  return `etiqueta-${tipo}${slug ? `-${slug}` : ''}.png`
 }
 
 function App() {
   const [etapa, setEtapa] = useState<Etapa>('upload')
-  const [layout, setLayout] = useState<LayoutEtiqueta | null>(null)
+  const [layouts, setLayouts] = useState<Partial<Record<TipoEtiqueta, LayoutEtiqueta>>>({})
   const [erroLayout, setErroLayout] = useState<string | null>(null)
+  const [tipoEtiqueta, setTipoEtiqueta] = useState<TipoEtiqueta>('sedex')
 
   const [processando, setProcessando] = useState(false)
   const [erroUpload, setErroUpload] = useState<string | null>(null)
@@ -57,8 +59,8 @@ function App() {
   const [filaImpressao, setFilaImpressao] = useState<ItemFilaImpressao[]>([])
 
   useEffect(() => {
-    obterLayoutEtiqueta()
-      .then(setLayout)
+    Promise.all(TIPOS_ETIQUETA.map((tipo) => obterLayoutEtiqueta(tipo).then((layout) => [tipo, layout] as const)))
+      .then((resultados) => setLayouts(Object.fromEntries(resultados)))
       .catch((erro) => setErroLayout(mensagemDeErro(erro, 'Não foi possível carregar o layout da etiqueta.')))
   }, [])
 
@@ -105,7 +107,7 @@ function App() {
     setGerando(true)
     setErroGeracao(null)
     try {
-      const blob = await gerarEtiqueta(campos)
+      const blob = await gerarEtiqueta(campos, tipoEtiqueta)
       if (imagemFinalUrl && !urlPertenceAFila(imagemFinalUrl)) URL.revokeObjectURL(imagemFinalUrl)
       setImagemFinalUrl(URL.createObjectURL(blob))
       setEtapa('pronta')
@@ -131,7 +133,7 @@ function App() {
     const novoItem: ItemFilaImpressao = {
       id: crypto.randomUUID(),
       url: imagemFinalUrl,
-      nomeArquivo: nomeParaArquivo(campos.destinatario),
+      nomeArquivo: nomeParaArquivo(campos.destinatario, tipoEtiqueta),
       destinatario: campos.destinatario,
     }
     setFilaImpressao((atual) => [...atual, novoItem])
@@ -186,10 +188,12 @@ function App() {
             <ConferenciaCard
               campos={campos}
               fonteEndereco={fonteEndereco}
-              layout={layout}
+              layout={layouts[tipoEtiqueta] ?? null}
+              tipoEtiqueta={tipoEtiqueta}
               gerando={gerando}
               erro={erroGeracao}
               onAlterarCampo={handleAlterarCampo}
+              onAlterarTipoEtiqueta={setTipoEtiqueta}
               onVoltar={handleVoltar}
               onConfirmar={handleConfirmar}
             />
@@ -198,7 +202,7 @@ function App() {
           {etapa === 'pronta' && imagemFinalUrl && (
             <ResultCard
               imagemUrl={imagemFinalUrl}
-              nomeArquivo={nomeParaArquivo(campos.destinatario)}
+              nomeArquivo={nomeParaArquivo(campos.destinatario, tipoEtiqueta)}
               naFila={Boolean(itemAtualNaFila)}
               filaCheia={filaImpressao.length >= LIMITE_FILA}
               onNovaEtiqueta={handleNovaEtiqueta}

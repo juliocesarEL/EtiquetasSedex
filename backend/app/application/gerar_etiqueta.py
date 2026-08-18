@@ -12,7 +12,14 @@ class GerarEtiquetaUseCase:
         self._renderizador = renderizador
 
     def executar(
-        self, destinatario: str, endereco: str, bairro: str, cidade: str, cep: str, observacoes: str = ""
+        self,
+        destinatario: str,
+        endereco: str,
+        bairro: str,
+        cidade: str,
+        cep: str,
+        observacoes: str = "",
+        tipo: str = "sedex",
     ) -> bytes:
         # Os campos chegam aqui editáveis pelo usuário no frontend, então são
         # tratados como entrada não confiável e sanitizados novamente.
@@ -23,4 +30,5 @@ class GerarEtiquetaUseCase:
             cidade=sanitizar_campo_etiqueta(cidade),
             cep=sanitizar_campo_etiqueta(cep, max_len=12),
             observacoes=sanitizar_campo_etiqueta(observacoes),
+            tipo=tipo,
         )

@@ -24,10 +24,11 @@
   border-radius: 50%;
   font-size: 0.8rem;
   font-weight: 700;
-  background: white;
+  background: var(--paper-raised);
   border: 1.5px solid var(--line);
   color: var(--ink-faint);
-  transition: all 0.25s var(--ease-out);
+  box-shadow: var(--shadow-xs);
+  transition: all 0.28s var(--ease-spring);
   flex-shrink: 0;
 }
 
@@ -42,14 +43,15 @@
 }
 
 .ativo .numero {
-  background: var(--navy-800);
+  background: linear-gradient(155deg, var(--navy-700), var(--navy-900));
   border-color: var(--navy-800);
   color: white;
   box-shadow: 0 0 0 4px var(--navy-100);
+  transform: scale(1.08);
 }
 
 .concluido .numero {
-  background: var(--success-500);
+  background: linear-gradient(155deg, #24b378, var(--success-500));
   border-color: var(--success-500);
   color: white;
 }
@@ -63,6 +65,7 @@
   height: 1.5px;
   background: var(--line);
   flex-shrink: 0;
+  transition: background-color 0.3s var(--ease-out);
 }
 
 .linhaConcluida {

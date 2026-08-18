@@ -6,6 +6,8 @@
   border-radius: var(--radius-md);
   font-size: 0.9rem;
   line-height: 1.45;
+  border: 1px solid transparent;
+  box-shadow: var(--shadow-xs);
   animation: rise 0.25s var(--ease-out);
 }
 
@@ -28,6 +30,7 @@
 .error {
   background: var(--danger-100);
   color: #8a2418;
+  border-color: rgba(230, 72, 58, 0.16);
 }
 
 .error .icon {
@@ -37,6 +40,7 @@
 .info {
   background: var(--info-100);
   color: #1c4a8f;
+  border-color: rgba(47, 111, 214, 0.16);
 }
 
 .info .icon {
@@ -46,6 +50,7 @@
 .success {
   background: var(--success-100);
   color: #106239;
+  border-color: rgba(31, 157, 99, 0.16);
 }
 
 .success .icon {

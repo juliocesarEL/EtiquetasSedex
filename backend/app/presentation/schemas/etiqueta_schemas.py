@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -10,6 +12,7 @@ class GerarEtiquetaRequest(BaseModel):
     cidade: str = Field(default="", max_length=200)
     cep: str = Field(default="", max_length=20)
     observacoes: str = Field(default="", max_length=200)
+    tipo: Literal["sedex", "pac"] = "sedex"
 
 
 class CampoLayoutResponse(BaseModel):

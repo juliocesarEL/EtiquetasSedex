@@ -9,6 +9,8 @@ export interface CamposEtiqueta {
 
 export type FonteEndereco = 'observacao' | 'topo' | null
 
+export type TipoEtiqueta = 'sedex' | 'pac'
+
 export interface CamposEtiquetaExtraidos extends CamposEtiqueta {
   fonteEndereco: FonteEndereco
 }

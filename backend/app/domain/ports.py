@@ -39,5 +39,12 @@ class RenderizadorEtiquetaPort(Protocol):
     """Desenha os campos de uma etiqueta sobre o template visual e retorna a imagem."""
 
     def renderizar(
-        self, destinatario: str, endereco: str, bairro: str, cidade: str, cep: str, observacoes: str = ""
+        self,
+        destinatario: str,
+        endereco: str,
+        bairro: str,
+        cidade: str,
+        cep: str,
+        observacoes: str = "",
+        tipo: str = "sedex",
     ) -> bytes: ...
