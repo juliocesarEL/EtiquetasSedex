@@ -1,0 +1,20 @@
+# Segredos — nunca versionar
+backend/.env
+.env
+
+# Python
+backend/venv/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node (o frontend já tem seu próprio .gitignore, isso é reforço na raiz)
+node_modules/
+dist/
+
+# Editor / SO
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db

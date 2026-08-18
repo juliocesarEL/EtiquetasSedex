@@ -1,0 +1,80 @@
+.trilha {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0 auto 2.25rem;
+  max-width: 560px;
+}
+
+.passo {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--ink-faint);
+  transition: color 0.2s var(--ease-out);
+}
+
+.numero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: white;
+  border: 1.5px solid var(--line);
+  color: var(--ink-faint);
+  transition: all 0.25s var(--ease-out);
+  flex-shrink: 0;
+}
+
+.rotulo {
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ativo {
+  color: var(--navy-800);
+}
+
+.ativo .numero {
+  background: var(--navy-800);
+  border-color: var(--navy-800);
+  color: white;
+  box-shadow: 0 0 0 4px var(--navy-100);
+}
+
+.concluido .numero {
+  background: var(--success-500);
+  border-color: var(--success-500);
+  color: white;
+}
+
+.concluido {
+  color: var(--ink-soft);
+}
+
+.linha {
+  width: clamp(24px, 6vw, 56px);
+  height: 1.5px;
+  background: var(--line);
+  flex-shrink: 0;
+}
+
+.linhaConcluida {
+  background: var(--success-500);
+}
+
+.rotulo {
+  display: none;
+}
+
+@media (min-width: 560px) {
+  .rotulo {
+    display: inline;
+  }
+}
