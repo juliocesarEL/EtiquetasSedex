@@ -79,6 +79,40 @@ Acesse http://localhost:5173 — o Vite já está configurado para
 encaminhar as chamadas `/api` e `/static` para o backend em
 `http://127.0.0.1:8000` (veja `frontend/vite.config.ts`).
 
+## Deploy (servidor interno)
+
+O backend serve tanto a API quanto o frontend já compilado — em produção
+roda um único processo.
+
+**Por que não PM2 (como o `bwr_fix`)?** Tentamos primeiro com PM2, mas no
+Windows ele não esconde a janela de console de processos que não são
+Node (como o Python) — o serviço ficava abrindo/fechando terminal sem
+parar. A solução foi rodar como **Serviço do Windows de verdade**, via
+[NSSM](https://nssm.cc/), que roda sem console nenhum por natureza e
+também não depende de login de usuário pra iniciar (o PM2 no Windows só
+reinicia no login; um serviço do Windows inicia no boot da máquina).
+
+O serviço já está instalado e chama-se **`SedexEtiquetas`** (nome de
+exibição "BWR - Etiquetas SEDEX"), com início automático.
+
+**A cada atualização** (depois de alterar o código), rode como
+Administrador (clique direito no arquivo → "Executar como administrador"):
+
+```bash
+deploy.bat
+```
+
+Isso gera o build novo do frontend (`frontend/dist`) e reinicia o serviço.
+
+- **Porta:** 3002 (a 3000 e 3001 já são usadas pelo `bwr-controle` e pelo
+  `estoque-bwr-app` nesta máquina).
+- **Acesso pela rede interna:** `http://IP_DO_SERVIDOR:3002`
+- **Logs:** `logs/service-out.log` e `logs/service-error.log`.
+- **Gerenciar o serviço:** `services.msc` (interface gráfica) ou, como
+  Administrador, `nssm status/start/stop/restart SedexEtiquetas`.
+- **Não precisa de HTTPS/domínio** — é uso só na rede local, igual aos
+  outros sistemas internos da BWR.
+
 ## Observações importantes
 
 - **PDFs não são armazenados**: o conteúdo é lido em memória, processado e

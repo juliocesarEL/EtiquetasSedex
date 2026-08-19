@@ -12,6 +12,9 @@ backend/venv/
 node_modules/
 dist/
 
+# Logs do PM2 em produção
+logs/*.log
+
 # Editor / SO
 .vscode/*
 !.vscode/extensions.json

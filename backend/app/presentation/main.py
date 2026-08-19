@@ -7,7 +7,7 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
-from app.config import ASSETS_DIR, get_settings
+from app.config import ASSETS_DIR, FRONTEND_DIST_DIR, get_settings
 from app.presentation.errors import registrar_handlers_de_erro
 from app.presentation.rate_limit import limiter
 from app.presentation.routes.etiqueta_routes import router as etiqueta_router
@@ -40,3 +40,11 @@ app.include_router(etiqueta_router)
 @app.get("/api/health")
 async def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+# Em produção, o build do frontend (frontend/dist) é servido pelo próprio
+# backend, num único processo — sem precisar de um servidor web separado.
+# Em desenvolvimento essa pasta não existe (usa-se `npm run dev` com proxy
+# do Vite), então o mount só acontece se ela estiver presente.
+if FRONTEND_DIST_DIR.is_dir():
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIST_DIR), html=True), name="frontend")

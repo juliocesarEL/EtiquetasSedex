@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import styles from './App.module.css'
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
-import { TruckIcon } from './components/icons'
 import { StepIndicator } from './components/StepIndicator'
 import type { Etapa } from './components/StepIndicator'
 import { UploadCard } from './components/UploadCard'
@@ -167,8 +166,6 @@ function App() {
     <div className={styles.app}>
       <Header />
       <main className={styles.main}>
-        <TruckIcon width={340} height={340} className={styles.marcaDagua} />
-
         <div className={styles.camadaConteudo}>
           <div className={styles.colunaLateral}>
             <ComoFunciona />

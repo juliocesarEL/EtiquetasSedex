@@ -37,17 +37,6 @@
   background: radial-gradient(circle, rgba(245, 196, 48, 0.16), transparent 70%);
 }
 
-.marcaDagua {
-  position: absolute;
-  bottom: -4%;
-  right: -3%;
-  color: var(--navy-800);
-  opacity: 0.045;
-  transform: rotate(-8deg);
-  pointer-events: none;
-  z-index: 0;
-}
-
 .camadaConteudo {
   position: relative;
   z-index: 1;

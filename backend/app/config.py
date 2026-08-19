@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 ASSETS_DIR = BASE_DIR / "assets"
+FRONTEND_DIST_DIR = BASE_DIR.parent / "frontend" / "dist"
 
 
 class Settings(BaseSettings):
