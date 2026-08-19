@@ -1,6 +1,6 @@
 # Etiquetas SEDEX — BWR
 
-Sistema de geração automática de etiquetas de envio (SEDEX e PAC) a partir do PDF do orçamento de uma transportadora. Substitui um processo manual feito no Word: sobe o PDF, o sistema extrai o destinatário e o endereço sozinho, você confere/ajusta numa prévia em tempo real, e baixa/imprime a etiqueta pronta no layout oficial da empresa.
+Sistema de geração automática de etiquetas de envio (SEDEX e PAC) a partir do PDF do orçamento do ERP da empresa. Substitui um processo manual feito no Word: sobe o PDF, o sistema extrai o destinatário e o endereço sozinho, você confere/ajusta numa prévia em tempo real, e baixa/imprime a etiqueta pronta no layout oficial da empresa.
 
 ![Tela de conferência com prévia em tempo real](docs/2-conferencia.png)
 
