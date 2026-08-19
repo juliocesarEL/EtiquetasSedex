@@ -1,130 +1,112 @@
-# Etiquetas SEDEX — BWR Bombas
+# Etiquetas SEDEX — BWR
 
-Sistema que substitui o preenchimento manual (no Word) das etiquetas SEDEX
-BWR: recebe o PDF do orçamento, extrai automaticamente o endereço de
-destino, mostra os campos para conferência/edição e gera a etiqueta final
-pronta para impressão, no mesmo layout azul usado hoje.
+Sistema de geração automática de etiquetas de envio (SEDEX e PAC) a partir do PDF do orçamento de uma transportadora. Substitui um processo manual feito no Word: sobe o PDF, o sistema extrai o destinatário e o endereço sozinho, você confere/ajusta numa prévia em tempo real, e baixa/imprime a etiqueta pronta no layout oficial da empresa.
+
+![Tela de conferência com prévia em tempo real](docs/2-conferencia.png)
+
+## Por que esse projeto é interessante
+
+Não é um CRUD. Tem um problema real de negócio no meio: o PDF do orçamento tem dois lugares possíveis pra endereço — um formato fixo no topo, e um campo de observação em **texto livre, sem padrão**, escrito à mão por pessoas diferentes, que quando presente tem prioridade sobre o do topo. Resolvi isso com:
+
+- **Regex** para o formato fixo (rápido, determinístico, sem custo).
+- **LLM** (Gemini/Groq, trocável por configuração) só para o texto livre — e só quando um pré-filtro barato (regex) indica que vale a pena gastar a chamada.
+- Uma **regra de negócio pura** (`priorizar_endereco`) decidindo qual endereço vence, isolada de qualquer detalhe de implementação — testável sem subir servidor, sem mockar nada.
+
+## Screenshots
+
+| Upload | Conferência (prévia ao vivo) | Etiqueta pronta |
+|---|---|---|
+| ![Upload](docs/1-upload.png) | ![Conferência](docs/2-conferencia.png) | ![Pronta](docs/3-pronta.png) |
 
 ## Stack
 
-- **Backend:** Python + FastAPI, pdfplumber (extração do PDF), Pillow
-  (geração da imagem da etiqueta) e um cliente de LLM gratuito (Groq ou
-  Gemini) para o endereço vindo do campo Observação.
-- **Frontend:** React + Vite + TypeScript.
+**Backend** — Python 3.12+, FastAPI, pdfplumber (extração de PDF), Pillow (geração da imagem da etiqueta), clientes HTTP próprios para Groq/Gemini.
 
-## Estrutura
+**Frontend** — React 19, TypeScript, Vite, CSS Modules (sem framework de UI — design system próprio).
+
+**Testes** — pytest (backend, incluindo testes de integração via `TestClient`) e Vitest + Testing Library (frontend).
+
+**CI** — GitHub Actions rodando testes e build a cada push/PR ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
+
+## Arquitetura
+
+O backend segue Clean Architecture, com a regra de dependência sempre apontando pra dentro:
 
 ```
-backend/
-  app/
-    domain/           # entidades e regras de negócio (prioridade de endereço, sanitização)
-    application/       # casos de uso (processar orçamento, gerar etiqueta)
-    infrastructure/     # pdfplumber, clientes Groq/Gemini, renderizador Pillow
-    presentation/        # rotas FastAPI, schemas, tratamento de erros
-  assets/               # template da etiqueta (PNG) e fontes
-  tests/                # testes automatizados (pytest)
-frontend/
-  src/
-    components/         # tela de upload, conferência, prévia e resultado
-    api/                # cliente HTTP para o backend
+backend/app/
+  domain/            # entidades e regras de negócio puras — zero import de FastAPI, Pillow, HTTP etc.
+    entities.py         Endereco, Orcamento, Etiqueta
+    ports.py             interfaces (Protocol) que a infraestrutura implementa
+    address_prioritizer.py   regra: observação tem prioridade sobre o topo
+    observacao_heuristics.py  pré-filtro: vale a pena chamar o LLM?
+    sanitization.py          sanitiza entrada antes de desenhar na etiqueta
+
+  application/       # casos de uso — orquestram domínio + portas, nada de detalhe concreto
+    processar_orcamento.py
+    gerar_etiqueta.py
+
+  infrastructure/    # implementações concretas das portas do domínio
+    pdf/                 pdfplumber + parser de regex do formato fixo
+    llm/                  clientes Groq e Gemini atrás da mesma interface
+    image/                renderizador Pillow (SEDEX e PAC, coordenadas calibradas em pixel)
+
+  presentation/      # FastAPI: rotas, schemas Pydantic, injeção de dependência, tratamento de erro
 ```
 
-## Como rodar
+**Por que isso importa na prática**: trocar de Groq pra Gemini é uma linha de config (`LLM_PROVIDER=gemini`), não uma reescrita — os dois implementam `ExtratorEnderecoLLMPort`. Testar a regra de priorização de endereço não precisa de PDF, de rede, nem de servidor rodando.
 
-### Backend
+O frontend não usa Redux/Context — o estado do fluxo (upload → conferência → pronta) vive no componente raiz (`App.tsx`) e desce via props; a lógica pura (montagem de nome de arquivo, ajuste de fonte do canvas) fica em módulos/hooks separados, testados isoladamente do React.
+
+## Testes
 
 ```bash
+# backend — 40 testes (unitários de domínio + integração via TestClient)
+cd backend && venv\Scripts\python.exe -m pytest -v
+
+# frontend — 26 testes (componentes com Testing Library + funções puras)
+cd frontend && npm test
+```
+
+O que os testes de integração do backend cobrem (com dublês de teste no lugar do LLM real, via `app.dependency_overrides` do FastAPI — sem chamada de rede nos testes):
+
+- Endereço do topo usado quando a observação não tem indício de endereço
+- Endereço da observação tem prioridade quando presente
+- Upload rejeitado quando não é PDF / está vazio / não tem assinatura de PDF válida
+- Erro interno não vaza detalhe (stack trace, mensagem da exceção) pro cliente
+- Geração da etiqueta funciona para os dois layouts (SEDEX/PAC) e sanitiza conteúdo malicioso sem quebrar
+
+## Segurança
+
+- PDFs nunca são salvos em disco — lidos em memória, processados, descartados.
+- Todo dado extraído do PDF (ou vindo do LLM) passa por sanitização antes de ir pra imagem: remove caracteres de controle e caracteres de override de direção de texto (usados em ataques de spoofing visual).
+- Rate limiting nos endpoints de upload/geração.
+- Chaves de API nunca tocam o frontend — toda chamada de LLM passa pelo backend.
+- Erros não vazam stack trace, path ou detalhe interno pro cliente (com teste garantindo isso).
+
+## Como rodar localmente
+
+```bash
+# backend
 cd backend
 python -m venv venv
-venv\Scripts\pip install -r requirements.txt      # Windows
-# source venv/bin/activate && pip install -r requirements.txt   # Linux/Mac
-
-copy .env.example .env                             # Windows
-# cp .env.example .env                              # Linux/Mac
-```
-
-Edite o `backend/.env` e cole sua chave gratuita do provedor de LLM
-escolhido (por padrão, Groq — crie a chave em console.groq.com):
-
-```
-LLM_PROVIDER=groq
-GROQ_API_KEY=sua_chave_aqui
-```
-
-Sem essa chave configurada, o sistema continua funcionando normalmente,
-apenas não tenta extrair o endereço da Observação e usa sempre o endereço
-padrão do topo do orçamento.
-
-Suba o servidor:
-
-```bash
+venv\Scripts\pip install -r requirements.txt -r requirements-dev.txt
+copy .env.example .env
 venv\Scripts\python.exe -m uvicorn app.presentation.main:app --reload --port 8000
-```
 
-Rodar os testes:
-
-```bash
-venv\Scripts\python.exe -m pytest
-```
-
-### Frontend
-
-```bash
+# frontend (outro terminal)
 cd frontend
 npm install
 npm run dev
 ```
 
-Acesse http://localhost:5173 — o Vite já está configurado para
-encaminhar as chamadas `/api` e `/static` para o backend em
-`http://127.0.0.1:8000` (veja `frontend/vite.config.ts`).
+Acesse `http://localhost:5173`. Sem uma chave de LLM configurada no `.env`, o sistema funciona normalmente — só não tenta extrair endereço da Observação, usa sempre o do topo.
 
 ## Deploy (servidor interno)
 
-O backend serve tanto a API quanto o frontend já compilado — em produção
-roda um único processo.
+O backend serve tanto a API quanto o frontend já compilado — em produção roda um único processo. Detalhes de infraestrutura (Windows Service via NSSM, por quê, portas, logs) estão documentados separadamente porque são específicos do ambiente de produção da empresa — veja [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
-**Por que não PM2 (como o `bwr_fix`)?** Tentamos primeiro com PM2, mas no
-Windows ele não esconde a janela de console de processos que não são
-Node (como o Python) — o serviço ficava abrindo/fechando terminal sem
-parar. A solução foi rodar como **Serviço do Windows de verdade**, via
-[NSSM](https://nssm.cc/), que roda sem console nenhum por natureza e
-também não depende de login de usuário pra iniciar (o PM2 no Windows só
-reinicia no login; um serviço do Windows inicia no boot da máquina).
+## Decisões de design que valem mencionar
 
-O serviço já está instalado e chama-se **`SedexEtiquetas`** (nome de
-exibição "BWR - Etiquetas SEDEX"), com início automático.
-
-**A cada atualização** (depois de alterar o código), rode como
-Administrador (clique direito no arquivo → "Executar como administrador"):
-
-```bash
-deploy.bat
-```
-
-Isso gera o build novo do frontend (`frontend/dist`) e reinicia o serviço.
-
-- **Porta:** 3002 (a 3000 e 3001 já são usadas pelo `bwr-controle` e pelo
-  `estoque-bwr-app` nesta máquina).
-- **Acesso pela rede interna:** `http://IP_DO_SERVIDOR:3002`
-- **Logs:** `logs/service-out.log` e `logs/service-error.log`.
-- **Gerenciar o serviço:** `services.msc` (interface gráfica) ou, como
-  Administrador, `nssm status/start/stop/restart SedexEtiquetas`.
-- **Não precisa de HTTPS/domínio** — é uso só na rede local, igual aos
-  outros sistemas internos da BWR.
-
-## Observações importantes
-
-- **PDFs não são armazenados**: o conteúdo é lido em memória, processado e
-  descartado ao final da requisição.
-- **Prioridade do endereço**: se houver um endereço de entrega detectado
-  no campo Observação (via LLM), ele tem prioridade sobre o endereço
-  padrão do topo do orçamento — essa regra fica isolada em
-  `backend/app/domain/address_prioritizer.py`.
-- **Regex do topo**: extrai o endereço assumindo o formato fixo descrito
-  no briefing (`Endereço: {logradouro}, {número} - {bairro}, {CIDADE}/{UF}
-  CEP: {cep}`). Se o rótulo do nome do cliente no orçamento real não for
-  `Cliente:`, ajuste `backend/app/infrastructure/pdf/orcamento_regex_parser.py`.
-- **Trocar de provedor de LLM**: basta mudar `LLM_PROVIDER` para `gemini`
-  no `.env` e preencher `GEMINI_API_KEY` — a regra de negócio não muda,
-  só a implementação por trás da interface (`ExtratorEnderecoLLMPort`).
+- **Prévia no cliente espelha o resultado do servidor pixel a pixel**: o frontend desenha a prévia num `<canvas>` usando as mesmas coordenadas e o mesmo algoritmo de ajuste de fonte (reduz até caber, trunca com reticências como último recurso) que o backend usa com Pillow — sem duplicar constantes mágicas, o backend expõe o layout via `GET /api/etiquetas/layout`.
+- **Dois templates de etiqueta (SEDEX/PAC), uma arquitetura**: adicionar o segundo layout foi só registrar um novo `TemplateEtiqueta` com suas coordenadas — nenhuma regra de negócio ou rota mudou.
+- **Fila de impressão sem duplicar lógica de extração**: agrupar até 4 etiquetas numa folha só reaproveita etiquetas já geradas e confirmadas individualmente — a decisão consciente foi *não* deixar conferir múltiplos orçamentos de uma vez, pra não criar uma tela onde é fácil trocar o endereço de um cliente pelo de outro sem perceber.

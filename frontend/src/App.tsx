@@ -12,6 +12,7 @@ import { ComoFunciona } from './components/ComoFunciona'
 import { Banner } from './components/ui/Banner'
 import { ApiError, gerarEtiqueta, obterLayoutEtiqueta, processarOrcamento } from './api/client'
 import { imprimirFolhaComEtiquetas } from './utils/imprimir'
+import { gerarId, nomeParaArquivo } from './utils/etiquetaUtils'
 import type { CamposEtiqueta, FonteEndereco, ItemFilaImpressao, LayoutEtiqueta, TipoEtiqueta } from './types'
 
 const CAMPOS_VAZIOS: CamposEtiqueta = {
@@ -28,18 +29,6 @@ const TIPOS_ETIQUETA: TipoEtiqueta[] = ['sedex', 'pac']
 
 function mensagemDeErro(erro: unknown, padrao: string): string {
   return erro instanceof ApiError ? erro.message : padrao
-}
-
-const PADRAO_MARCAS_DIACRITICAS = /[̀-ͯ]/g
-
-function nomeParaArquivo(destinatario: string, tipo: TipoEtiqueta): string {
-  const slug = destinatario
-    .normalize('NFD')
-    .replace(PADRAO_MARCAS_DIACRITICAS, '')
-    .replace(/[^a-zA-Z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
-    .toLowerCase()
-  return `etiqueta-${tipo}${slug ? `-${slug}` : ''}.png`
 }
 
 function App() {
@@ -133,7 +122,7 @@ function App() {
   function handleAdicionarAFila() {
     if (!imagemFinalUrl || filaImpressao.length >= LIMITE_FILA) return
     const novoItem: ItemFilaImpressao = {
-      id: crypto.randomUUID(),
+      id: gerarId(),
       url: imagemFinalUrl,
       nomeArquivo: nomeParaArquivo(campos.destinatario, tipoEtiqueta),
       destinatario: campos.destinatario,

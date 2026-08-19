@@ -4,7 +4,7 @@ import type { CamposEtiqueta, LayoutEtiqueta } from '../types'
 const TAMANHO_FONTE_MINIMO = 14
 const REENTICENCIAS = '…'
 
-function ajustarTextoAoCampo(
+export function ajustarTextoAoCampo(
   ctx: CanvasRenderingContext2D,
   texto: string,
   largura: number,
