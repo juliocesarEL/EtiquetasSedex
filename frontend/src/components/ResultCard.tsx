@@ -1,6 +1,6 @@
 import styles from './ResultCard.module.css'
 import { Button } from './ui/Button'
-import { CheckCircleIcon, DownloadIcon, LayersIcon, PrinterIcon, RefreshIcon } from './icons'
+import { ArrowLeftIcon, CheckCircleIcon, DownloadIcon, LayersIcon, PrinterIcon, RefreshIcon } from './icons'
 import { imprimirEtiquetaUnica } from '../utils/imprimir'
 
 interface ResultCardProps {
@@ -8,6 +8,7 @@ interface ResultCardProps {
   nomeArquivo: string
   naFila: boolean
   filaCheia: boolean
+  onVoltar: () => void
   onNovaEtiqueta: () => void
   onAdicionarAFila: () => void
   onRemoverDaFila: () => void
@@ -18,12 +19,18 @@ export function ResultCard({
   nomeArquivo,
   naFila,
   filaCheia,
+  onVoltar,
   onNovaEtiqueta,
   onAdicionarAFila,
   onRemoverDaFila,
 }: ResultCardProps) {
   return (
     <div className={styles.card}>
+      <button type="button" className={styles.voltarCanto} onClick={onVoltar}>
+        <ArrowLeftIcon width={16} height={16} />
+        Voltar
+      </button>
+
       <div className={styles.selo}>
         <CheckCircleIcon width={26} height={26} />
       </div>

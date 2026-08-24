@@ -19,6 +19,29 @@
   background: linear-gradient(90deg, var(--success-500), var(--amber-400));
 }
 
+.voltarCanto {
+  position: absolute;
+  top: 1.1rem;
+  left: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: none;
+  background: none;
+  padding: 0.25rem 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+  border-radius: var(--radius-sm, 6px);
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.voltarCanto:hover {
+  color: var(--ink);
+  background: rgba(16, 27, 48, 0.06);
+}
+
 .selo {
   display: inline-flex;
   align-items: center;

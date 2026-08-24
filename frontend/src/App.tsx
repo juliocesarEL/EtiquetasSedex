@@ -109,6 +109,11 @@ function App() {
     }
   }
 
+  function handleVoltarParaConferencia() {
+    setErroGeracao(null)
+    setEtapa('conferencia')
+  }
+
   function handleNovaEtiqueta() {
     if (imagemFinalUrl && !urlPertenceAFila(imagemFinalUrl)) URL.revokeObjectURL(imagemFinalUrl)
     setImagemFinalUrl(null)
@@ -214,6 +219,7 @@ function App() {
                   nomeArquivo={nomeParaArquivo(campos.destinatario, tipoEtiqueta)}
                   naFila={Boolean(itemAtualNaFila)}
                   filaCheia={filaImpressao.length >= LIMITE_FILA}
+                  onVoltar={handleVoltarParaConferencia}
                   onNovaEtiqueta={handleNovaEtiqueta}
                   onAdicionarAFila={handleAdicionarAFila}
                   onRemoverDaFila={() => itemAtualNaFila && handleRemoverDaFila(itemAtualNaFila.id)}
